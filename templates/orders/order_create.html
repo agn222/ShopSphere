@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Checkout | ShopSphere
+{% endblock %}
+
+{% block content %}
+
+<div class="mb-8">
+    <h1 class="text-3xl font-bold">
+        Checkout
+    </h1>
+
+    <p class="mt-2 text-gray-500">
+        Confirm your shipping information and order.
+    </p>
+</div>
+
+<div class="grid gap-8 lg:grid-cols-3">
+
+    <!-- Checkout Form -->
+    <section class="lg:col-span-2">
+
+        <form
+            method="post"
+            class="rounded-2xl border bg-white p-8 shadow-sm"
+        >
+            {% csrf_token %}
+
+            <h2 class="text-xl font-bold">
+                Shipping Information
+            </h2>
+
+            {% if form.non_field_errors %}
+                <div class="mt-5 rounded-lg bg-red-100 p-4 text-red-700">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <div class="mt-6 grid gap-5 md:grid-cols-2">
+
+                {% for field in form %}
+
+                    {% if field.name != "coupon_code" %}
+
+                        <div
+                            {% if field.name == "address_line_1" or field.name == "address_line_2" %}
+                                class="md:col-span-2"
+                            {% endif %}
+                        >
+
+                            <label
+                                for="{{ field.id_for_label }}"
+                                class="mb-2 block font-semibold"
+                            >
+                                {{ field.label }}
+
+                                {% if not field.field.required %}
+                                    <span class="font-normal text-gray-400">
+                                        (optional)
+                                    </span>
+                                {% endif %}
+                            </label>
+
+                            {{ field }}
+
+                            {% for error in field.errors %}
+                                <p class="mt-1 text-sm text-red-600">
+                                    {{ error }}
+                                </p>
+                            {% endfor %}
+
+                        </div>
+
+                    {% endif %}
+
+                {% endfor %}
+
+            </div>
+
+            <!-- Coupon Section -->
+
+            <div class="mt-8 border-t pt-6">
+
+                <h2 class="text-xl font-bold">
+                    Coupon
+                </h2>
+
+                <div class="mt-4">
+
+                    <label
+                        for="{{ form.coupon_code.id_for_label }}"
+                        class="mb-2 block font-semibold"
+                    >
+                        Coupon Code
+                    </label>
+
+                    {{ form.coupon_code }}
+
+                    {% for error in form.coupon_code.errors %}
+                        <p class="mt-1 text-sm text-red-600">
+                            {{ error }}
+                        </p>
+                    {% endfor %}
+
+                    <p class="mt-2 text-sm text-gray-500">
+                        Enter a valid coupon code if you have one.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <button
+                type="submit"
+                class="mt-8 w-full rounded-lg bg-blue-600 px-6 py-4 text-lg font-semibold text-white hover:bg-blue-700"
+            >
+                Place Order
+            </button>
+
+        </form>
+
+    </section>
+
+    <!-- Order Summary -->
+
+    <aside class="h-fit rounded-2xl border bg-white p-6 shadow-sm">
+
+        <h2 class="text-xl font-bold">
+            Order Summary
+        </h2>
+
+        <div class="mt-6 space-y-5">
+
+            {% for item in cart %}
+
+                <div class="flex gap-4">
+
+                    {% if item.product.image %}
+                        <img
+                            src="{{ item.product.image.url }}"
+                            alt="{{ item.product.name }}"
+                            class="h-16 w-16 rounded-lg object-cover"
+                        >
+                    {% endif %}
+
+                    <div class="min-w-0 flex-1">
+
+                        <p class="font-semibold">
+                            {{ item.product.name }}
+                        </p>
+
+                        <p class="text-sm text-gray-500">
+                            Quantity: {{ item.quantity }}
+                        </p>
+
+                    </div>
+
+                    <p class="font-semibold">
+                        ₹{{ item.total_price }}
+                    </p>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+        <div class="mt-6 border-t pt-5">
+
+            <div class="flex justify-between text-gray-600">
+
+                <span>
+                    Delivery
+                </span>
+
+                <span class="font-semibold text-green-600">
+                    Free
+                </span>
+
+            </div>
+
+            <div class="mt-4 flex justify-between text-xl font-bold">
+
+                <span>
+                    Total
+                </span>
+
+                <span>
+                    ₹{{ cart.get_total_price }}
+                </span>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+</div>
+
+{% endblock %}

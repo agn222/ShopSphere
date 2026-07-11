@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Your Cart | ShopSphere
+{% endblock %}
+
+{% block content %}
+
+<div class="mb-8 flex items-center justify-between">
+    <div>
+        <h1 class="text-3xl font-bold">
+            Your Shopping Cart
+        </h1>
+
+        <p class="mt-2 text-gray-500">
+            Review your selected products.
+        </p>
+    </div>
+
+    <a
+        href="{% url 'store:product_list' %}"
+        class="font-semibold text-blue-600 hover:underline"
+    >
+        Continue shopping
+    </a>
+</div>
+
+
+{% if cart|length > 0 %}
+
+    <div class="grid gap-8 lg:grid-cols-3">
+
+        <section class="space-y-5 lg:col-span-2">
+
+            {% for item in cart %}
+
+                {% with product=item.product %}
+
+                    <article
+                        class="flex flex-col gap-5 rounded-xl border bg-white p-5 shadow-sm sm:flex-row"
+                    >
+
+                        <a href="{{ product.get_absolute_url }}">
+                            {% if product.image %}
+                                <img
+                                    src="{{ product.image.url }}"
+                                    alt="{{ product.name }}"
+                                    class="h-32 w-full rounded-lg object-cover sm:w-36"
+                                >
+                            {% else %}
+                                <div
+                                    class="flex h-32 w-full items-center justify-center rounded-lg bg-gray-200 text-gray-500 sm:w-36"
+                                >
+                                    No image
+                                </div>
+                            {% endif %}
+                        </a>
+
+
+                        <div class="flex flex-1 flex-col justify-between">
+
+                            <div>
+                                <p class="text-sm font-semibold text-blue-600">
+                                    {{ product.category.name }}
+                                </p>
+
+                                <a href="{{ product.get_absolute_url }}">
+                                    <h2 class="mt-1 text-xl font-bold hover:text-blue-600">
+                                        {{ product.name }}
+                                    </h2>
+                                </a>
+
+                                <p class="mt-2 text-gray-500">
+                                    ₹{{ item.price }} each
+                                </p>
+                            </div>
+
+
+                            <div
+                                class="mt-5 flex flex-wrap items-end justify-between gap-4"
+                            >
+
+                                <form
+                                    method="post"
+                                    action="{% url 'cart:cart_add' product.id %}"
+                                    class="flex items-end gap-3"
+                                >
+                                    {% csrf_token %}
+
+                                    <div>
+                                        <label class="mb-1 block text-sm font-medium">
+                                            Quantity
+                                        </label>
+
+                                        <select
+                                            name="quantity"
+                                            class="rounded-lg border px-3 py-2"
+                                        >
+                                            {% for value, label in item.update_quantity_form.quantity.field.choices %}
+                                                <option
+                                                    value="{{ value }}"
+                                                    {% if value == item.quantity %}
+                                                        selected
+                                                    {% endif %}
+                                                >
+                                                    {{ label }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+
+                                        <input
+                                            type="hidden"
+                                            name="override"
+                                            value="True"
+                                        >
+                                    </div>
+
+                                    <button
+                                        type="submit"
+                                        class="rounded-lg border px-4 py-2 font-semibold hover:bg-gray-100"
+                                    >
+                                        Update
+                                    </button>
+                                </form>
+
+
+                                <div class="text-right">
+                                    <p class="text-xl font-bold">
+                                        ₹{{ item.total_price }}
+                                    </p>
+
+                                    <form
+                                        method="post"
+                                        action="{% url 'cart:cart_remove' product.id %}"
+                                        class="mt-2"
+                                    >
+                                        {% csrf_token %}
+
+                                        <button
+                                            type="submit"
+                                            class="text-sm font-semibold text-red-600 hover:underline"
+                                        >
+                                            Remove
+                                        </button>
+                                    </form>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </article>
+
+                {% endwith %}
+
+            {% endfor %}
+
+        </section>
+
+
+        <aside class="h-fit rounded-xl border bg-white p-6 shadow-sm">
+
+            <h2 class="text-xl font-bold">
+                Order Summary
+            </h2>
+
+            <div class="mt-6 space-y-4">
+
+                <div class="flex justify-between text-gray-600">
+                    <span>
+                        Items
+                    </span>
+
+                    <span>
+                        {{ cart|length }}
+                    </span>
+                </div>
+
+                <div class="flex justify-between text-gray-600">
+                    <span>
+                        Delivery
+                    </span>
+
+                    <span class="font-semibold text-green-600">
+                        Free
+                    </span>
+                </div>
+
+                <div class="border-t pt-4">
+                    <div class="flex justify-between text-xl font-bold">
+                        <span>
+                            Total
+                        </span>
+
+                        <span>
+                            ₹{{ cart.get_total_price }}
+                        </span>
+                    </div>
+                </div>
+
+            </div>
+
+            {% if user.is_authenticated %}
+
+    <a
+        href="{% url 'orders:order_create' %}"
+        class="mt-6 block w-full rounded-lg bg-blue-600 px-5 py-3 text-center font-semibold text-white hover:bg-blue-700"
+    >
+        Proceed to Checkout
+    </a>
+
+{% else %}
+
+    <a
+        href="{% url 'accounts:login' %}?next={% url 'orders:order_create' %}"
+        class="mt-6 block w-full rounded-lg bg-blue-600 px-5 py-3 text-center font-semibold text-white hover:bg-blue-700"
+    >
+        Login to Checkout
+    </a>
+
+{% endif %}
+
+        </aside>
+
+    </div>
+
+{% else %}
+
+    <div class="rounded-xl border bg-white p-12 text-center shadow-sm">
+
+        <h2 class="text-2xl font-bold">
+            Your cart is empty
+        </h2>
+
+        <p class="mt-3 text-gray-500">
+            Add some products before continuing to checkout.
+        </p>
+
+        <a
+            href="{% url 'store:product_list' %}"
+            class="mt-6 inline-block rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white hover:bg-blue-700"
+        >
+            Browse Products
+        </a>
+
+    </div>
+
+{% endif %}
+
+{% endblock %}

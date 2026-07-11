@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Login | ShopSphere
+{% endblock %}
+
+{% block content %}
+
+<div class="mx-auto max-w-md rounded-2xl border bg-white p-8 shadow-sm">
+
+    <div class="text-center">
+        <h1 class="text-3xl font-bold">
+            Welcome back
+        </h1>
+
+        <p class="mt-2 text-gray-500">
+            Log in to continue shopping.
+        </p>
+    </div>
+
+    <form method="post" class="mt-8 space-y-5">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="rounded-lg bg-red-100 p-4 text-red-700">
+                Incorrect username or password.
+            </div>
+        {% endif %}
+
+        <div>
+            <label
+                for="{{ form.username.id_for_label }}"
+                class="mb-2 block font-semibold"
+            >
+                Username
+            </label>
+
+            <input
+                type="text"
+                name="username"
+                id="{{ form.username.id_for_label }}"
+                required
+                autofocus
+                class="w-full rounded-lg border px-4 py-3 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+            >
+        </div>
+
+        <div>
+            <label
+                for="{{ form.password.id_for_label }}"
+                class="mb-2 block font-semibold"
+            >
+                Password
+            </label>
+
+            <input
+                type="password"
+                name="password"
+                id="{{ form.password.id_for_label }}"
+                required
+                class="w-full rounded-lg border px-4 py-3 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+            >
+        </div>
+
+        {% if next %}
+            <input
+                type="hidden"
+                name="next"
+                value="{{ next }}"
+            >
+        {% endif %}
+
+        <button
+            type="submit"
+            class="w-full rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700"
+        >
+            Login
+        </button>
+    </form>
+
+    <p class="mt-6 text-center text-gray-500">
+        Don't have an account?
+
+        <a
+            href="{% url 'accounts:register' %}"
+            class="font-semibold text-blue-600 hover:underline"
+        >
+            Register
+        </a>
+    </p>
+
+</div>
+
+{% endblock %}

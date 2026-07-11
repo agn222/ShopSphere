@@ -1,0 +1,515 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Products | ShopSphere
+{% endblock %}
+
+{% block content %}
+
+<section class="mb-10 rounded-2xl bg-blue-600 px-8 py-12 text-white">
+    <h1 class="text-4xl font-bold">
+        Discover products you will love
+    </h1>
+
+    <p class="mt-3 max-w-2xl text-blue-100">
+        Browse our latest collection of quality products at great prices.
+    </p>
+
+    <a
+        href="#products"
+        class="mt-6 inline-block rounded-lg bg-white px-5 py-3 font-semibold text-blue-600"
+    >
+        Shop now
+    </a>
+</section>
+
+
+<!-- Search, filters and sorting -->
+<div class="mb-8 rounded-xl border bg-white p-6 shadow-sm">
+
+    <form method="get">
+
+        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+
+            <div class="md:col-span-2">
+                <label
+                    for="search"
+                    class="mb-2 block text-sm font-semibold"
+                >
+                    Search
+                </label>
+
+                <input
+                    type="text"
+                    id="search"
+                    name="search"
+                    value="{{ search_query }}"
+                    placeholder="Search by product or category"
+                    class="w-full rounded-lg border px-4 py-3 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                >
+            </div>
+
+            <div>
+                <label
+                    for="min-price"
+                    class="mb-2 block text-sm font-semibold"
+                >
+                    Minimum price
+                </label>
+
+                <input
+                    type="number"
+                    id="min-price"
+                    name="min_price"
+                    value="{{ min_price }}"
+                    min="0"
+                    step="0.01"
+                    placeholder="₹0"
+                    class="w-full rounded-lg border px-4 py-3 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                >
+            </div>
+
+            <div>
+                <label
+                    for="max-price"
+                    class="mb-2 block text-sm font-semibold"
+                >
+                    Maximum price
+                </label>
+
+                <input
+                    type="number"
+                    id="max-price"
+                    name="max_price"
+                    value="{{ max_price }}"
+                    min="0"
+                    step="0.01"
+                    placeholder="₹5000"
+                    class="w-full rounded-lg border px-4 py-3 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                >
+            </div>
+
+            <div>
+                <label
+                    for="sort"
+                    class="mb-2 block text-sm font-semibold"
+                >
+                    Sort by
+                </label>
+
+                <select
+                    id="sort"
+                    name="sort"
+                    class="w-full rounded-lg border px-4 py-3"
+                >
+                    <option value="">
+                        Default
+                    </option>
+
+                    <option
+                        value="newest"
+                        {% if selected_sort == "newest" %}selected{% endif %}
+                    >
+                        Newest
+                    </option>
+
+                    <option
+                        value="oldest"
+                        {% if selected_sort == "oldest" %}selected{% endif %}
+                    >
+                        Oldest
+                    </option>
+
+                    <option
+                        value="price_low"
+                        {% if selected_sort == "price_low" %}selected{% endif %}
+                    >
+                        Price: Low to High
+                    </option>
+
+                    <option
+                        value="price_high"
+                        {% if selected_sort == "price_high" %}selected{% endif %}
+                    >
+                        Price: High to Low
+                    </option>
+
+                    <option
+                        value="name_az"
+                        {% if selected_sort == "name_az" %}selected{% endif %}
+                    >
+                        Name: A-Z
+                    </option>
+
+                    <option
+                        value="name_za"
+                        {% if selected_sort == "name_za" %}selected{% endif %}
+                    >
+                        Name: Z-A
+                    </option>
+                </select>
+            </div>
+
+        </div>
+
+
+        <div class="mt-5 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+
+            <div>
+                <p class="mb-2 text-sm font-semibold">
+                    Availability
+                </p>
+
+                <div class="flex flex-wrap gap-4">
+
+                    <label class="flex cursor-pointer items-center gap-2">
+                        <input
+                            type="radio"
+                            name="availability"
+                            value=""
+                            {% if not availability %}checked{% endif %}
+                        >
+                        All
+                    </label>
+
+                    <label class="flex cursor-pointer items-center gap-2">
+                        <input
+                            type="radio"
+                            name="availability"
+                            value="in_stock"
+                            {% if availability == "in_stock" %}checked{% endif %}
+                        >
+                        In stock
+                    </label>
+
+                    <label class="flex cursor-pointer items-center gap-2">
+                        <input
+                            type="radio"
+                            name="availability"
+                            value="out_of_stock"
+                            {% if availability == "out_of_stock" %}checked{% endif %}
+                        >
+                        Out of stock
+                    </label>
+
+                </div>
+            </div>
+
+
+            <div class="flex gap-3">
+
+                <a
+                    href="{% if category %}{{ category.get_absolute_url }}{% else %}{% url 'store:product_list' %}{% endif %}"
+                    class="rounded-lg border px-6 py-3 font-semibold hover:bg-gray-50"
+                >
+                    Clear
+                </a>
+
+                <button
+                    type="submit"
+                    class="rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white hover:bg-blue-700"
+                >
+                    Apply Filters
+                </button>
+
+            </div>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+<div class="grid gap-8 lg:grid-cols-4">
+
+    <!-- Categories sidebar -->
+    <aside>
+        <h2 class="mb-4 text-xl font-bold">
+            Categories
+        </h2>
+
+        <div class="overflow-hidden rounded-xl border bg-white">
+
+            <a
+                href="{% url 'store:product_list' %}"
+                class="block border-b px-4 py-3 hover:bg-gray-100
+                {% if not category %}bg-blue-50 font-semibold text-blue-600{% endif %}"
+            >
+                All products
+            </a>
+
+            {% for item in categories %}
+
+                <a
+                    href="{{ item.get_absolute_url }}"
+                    class="block border-b px-4 py-3 last:border-b-0 hover:bg-gray-100
+                    {% if category == item %}bg-blue-50 font-semibold text-blue-600{% endif %}"
+                >
+                    {{ item.name }}
+                </a>
+
+            {% empty %}
+
+                <p class="px-4 py-3 text-gray-500">
+                    No categories available.
+                </p>
+
+            {% endfor %}
+
+        </div>
+    </aside>
+
+
+    <!-- Products section -->
+    <section
+        id="products"
+        class="lg:col-span-3"
+    >
+
+        <div class="mb-6 flex items-center justify-between">
+
+            <div>
+                <h2 class="text-2xl font-bold">
+
+                    {% if category %}
+                        {{ category.name }}
+                    {% else %}
+                        All Products
+                    {% endif %}
+
+                </h2>
+
+                <p class="mt-1 text-gray-500">
+                    {{ page_obj.paginator.count }}
+                    product{{ page_obj.paginator.count|pluralize }} found
+                </p>
+            </div>
+
+        </div>
+
+
+        <!-- Product grid -->
+        <div class="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+
+            {% for product in products %}
+
+                <article
+                    class="overflow-hidden rounded-xl border bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+                >
+
+                    <a href="{{ product.get_absolute_url }}">
+
+                        {% if product.image %}
+
+                            <img
+                                src="{{ product.image.url }}"
+                                alt="{{ product.name }}"
+                                class="h-56 w-full object-cover"
+                            >
+
+                        {% else %}
+
+                            <div class="flex h-56 items-center justify-center bg-gray-200 text-gray-500">
+                                No image
+                            </div>
+
+                        {% endif %}
+
+                    </a>
+
+
+                    <div class="p-5">
+
+                        <p class="text-sm font-medium text-blue-600">
+                            {{ product.category.name }}
+                        </p>
+
+                        <a href="{{ product.get_absolute_url }}">
+                            <h3 class="mt-1 text-lg font-bold hover:text-blue-600">
+                                {{ product.name }}
+                            </h3>
+                        </a>
+
+                        <p class="mt-2 line-clamp-2 text-sm text-gray-500">
+                            {{ product.description|truncatewords:15 }}
+                        </p>
+
+
+                        <div class="mt-5 flex items-center justify-between">
+
+                            <span class="text-xl font-bold">
+                                ₹{{ product.price }}
+                            </span>
+
+                            {% if product.stock > 0 %}
+
+                                <span class="text-sm font-medium text-green-600">
+                                    In stock
+                                </span>
+
+                            {% else %}
+
+                                <span class="text-sm font-medium text-red-600">
+                                    Out of stock
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <a
+                            href="{{ product.get_absolute_url }}"
+                            class="mt-5 block rounded-lg bg-blue-600 px-4 py-3 text-center font-semibold text-white hover:bg-blue-700"
+                        >
+                            View Product
+                        </a>
+
+
+                        {% if user.is_authenticated %}
+
+                            <form
+                                method="post"
+                                action="{% url 'accounts:wishlist_add' product.id %}"
+                                class="mt-3"
+                            >
+                                {% csrf_token %}
+
+                                <input
+                                    type="hidden"
+                                    name="next"
+                                    value="{{ request.get_full_path }}"
+                                >
+
+                                <button
+                                    type="submit"
+                                    class="w-full rounded-lg border border-blue-600 px-4 py-3 font-semibold text-blue-600 hover:bg-blue-50"
+                                >
+                                    ♡ Add to Wishlist
+                                </button>
+
+                            </form>
+
+                        {% else %}
+
+                            <a
+                                href="{% url 'accounts:login' %}?next={{ request.get_full_path|urlencode }}"
+                                class="mt-3 block rounded-lg border border-blue-600 px-4 py-3 text-center font-semibold text-blue-600 hover:bg-blue-50"
+                            >
+                                ♡ Add to Wishlist
+                            </a>
+
+                        {% endif %}
+
+                    </div>
+                </article>
+
+
+            {% empty %}
+
+                <div class="col-span-full rounded-xl border bg-white p-10 text-center">
+
+                    <h3 class="text-xl font-bold">
+                        No products found
+                    </h3>
+
+                    <p class="mt-2 text-gray-500">
+                        Try changing your search or filter options.
+                    </p>
+
+                    <a
+                        href="{% if category %}{{ category.get_absolute_url }}{% else %}{% url 'store:product_list' %}{% endif %}"
+                        class="mt-5 inline-block rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700"
+                    >
+                        Clear Filters
+                    </a>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+
+        <!-- Pagination must remain outside the product loop -->
+        {% if page_obj.has_other_pages %}
+
+            <nav
+                class="mt-10 flex flex-wrap items-center justify-center gap-2"
+                aria-label="Product pagination"
+            >
+
+                {% if page_obj.has_previous %}
+
+                    <a
+                        href="?page=1{% if query_string %}&{{ query_string }}{% endif %}"
+                        class="rounded-lg border bg-white px-4 py-2 font-medium hover:bg-gray-50"
+                    >
+                        First
+                    </a>
+
+                    <a
+                        href="?page={{ page_obj.previous_page_number }}{% if query_string %}&{{ query_string }}{% endif %}"
+                        class="rounded-lg border bg-white px-4 py-2 font-medium hover:bg-gray-50"
+                    >
+                        Previous
+                    </a>
+
+                {% endif %}
+
+
+                {% for page_number in page_obj.paginator.page_range %}
+
+                    {% if page_number == page_obj.number %}
+
+                        <span class="rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white">
+                            {{ page_number }}
+                        </span>
+
+                    {% elif page_number >= page_obj.number|add:"-2" and page_number <= page_obj.number|add:"2" %}
+
+                        <a
+                            href="?page={{ page_number }}{% if query_string %}&{{ query_string }}{% endif %}"
+                            class="rounded-lg border bg-white px-4 py-2 font-medium hover:bg-gray-50"
+                        >
+                            {{ page_number }}
+                        </a>
+
+                    {% endif %}
+
+                {% endfor %}
+
+
+                {% if page_obj.has_next %}
+
+                    <a
+                        href="?page={{ page_obj.next_page_number }}{% if query_string %}&{{ query_string }}{% endif %}"
+                        class="rounded-lg border bg-white px-4 py-2 font-medium hover:bg-gray-50"
+                    >
+                        Next
+                    </a>
+
+                    <a
+                        href="?page={{ page_obj.paginator.num_pages }}{% if query_string %}&{{ query_string }}{% endif %}"
+                        class="rounded-lg border bg-white px-4 py-2 font-medium hover:bg-gray-50"
+                    >
+                        Last
+                    </a>
+
+                {% endif %}
+
+            </nav>
+
+            <p class="mt-3 text-center text-sm text-gray-500">
+                Page {{ page_obj.number }}
+                of {{ page_obj.paginator.num_pages }}
+            </p>
+
+        {% endif %}
+
+    </section>
+
+</div>
+
+{% endblock %}

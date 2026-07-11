@@ -1,0 +1,264 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Payment | ShopSphere
+{% endblock %}
+
+{% block content %}
+
+<div class="mx-auto max-w-xl">
+
+    <div class="rounded-2xl border bg-white p-8 shadow-sm">
+
+        <div class="text-center">
+
+            <h1 class="text-3xl font-bold">
+                Complete Payment
+            </h1>
+
+            <p class="mt-2 text-gray-500">
+                Order #{{ order.id }}
+            </p>
+
+        </div>
+
+        <div class="mt-8 rounded-xl bg-gray-50 p-6">
+
+            <div class="flex justify-between">
+
+                <span class="text-gray-500">
+                    Customer
+                </span>
+
+                <span class="font-semibold">
+                    {{ order.first_name }}
+                    {{ order.last_name }}
+                </span>
+
+            </div>
+
+            <div class="mt-4 flex justify-between">
+
+                <span class="text-gray-500">
+                    Email
+                </span>
+
+                <span class="font-semibold">
+                    {{ order.email }}
+                </span>
+
+            </div>
+
+
+            <!-- Subtotal -->
+
+            <div class="mt-4 flex justify-between">
+
+                <span class="text-gray-500">
+                    Subtotal
+                </span>
+
+                <span class="font-semibold">
+                    ₹{{ order.get_subtotal }}
+                </span>
+
+            </div>
+
+
+            <!-- Coupon -->
+
+            {% if order.discount > 0 %}
+
+                <div class="mt-4 flex justify-between text-green-600">
+
+                    <span>
+                        Coupon ({{ order.coupon_code }})
+                    </span>
+
+                    <span class="font-semibold">
+                        - ₹{{ order.discount }}
+                    </span>
+
+                </div>
+
+            {% endif %}
+
+
+            <!-- Delivery -->
+
+            <div class="mt-4 flex justify-between">
+
+                <span class="text-gray-500">
+                    Delivery
+                </span>
+
+                <span class="font-semibold text-green-600">
+                    Free
+                </span>
+
+            </div>
+
+
+            <!-- Total -->
+
+            <div class="mt-4 flex justify-between border-t pt-4">
+
+                <span class="text-xl font-bold">
+                    Total
+                </span>
+
+                <span class="text-xl font-bold">
+                    ₹{{ order.get_total_price }}
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <button
+            id="pay-button"
+            type="button"
+            class="mt-8 w-full rounded-lg bg-blue-600 px-6 py-4 text-lg font-semibold text-white hover:bg-blue-700"
+        >
+            Pay ₹{{ order.get_total_price }}
+        </button>
+
+        <a
+            href="{{ order.get_absolute_url }}"
+            class="mt-4 block text-center font-semibold text-gray-500 hover:text-gray-900"
+        >
+            View Order Details
+        </a>
+
+    </div>
+
+</div>
+
+
+<form
+    id="payment-verification-form"
+    method="post"
+    action="{% url 'orders:payment_verify' order.id %}"
+    class="hidden"
+>
+
+    {% csrf_token %}
+
+    <input
+        type="hidden"
+        name="razorpay_payment_id"
+        id="razorpay-payment-id"
+    >
+
+    <input
+        type="hidden"
+        name="razorpay_order_id"
+        id="razorpay-order-id"
+    >
+
+    <input
+        type="hidden"
+        name="razorpay_signature"
+        id="razorpay-signature"
+    >
+
+</form>
+
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+
+const options = {
+
+    key: "{{ razorpay_key_id|escapejs }}",
+
+    amount: "{{ razorpay_amount }}",
+
+    currency: "{{ razorpay_currency|escapejs }}",
+
+    name: "ShopSphere",
+
+    description: "Payment for Order #{{ order.id }}",
+
+    order_id: "{{ razorpay_order_id|escapejs }}",
+
+    prefill: {
+
+        name: "{{ order.first_name|escapejs }} {{ order.last_name|escapejs }}",
+
+        email: "{{ order.email|escapejs }}",
+
+        contact: "{{ order.phone_number|escapejs }}"
+
+    },
+
+    theme: {
+
+        color: "#2563eb"
+
+    },
+
+    handler: function (response) {
+
+        document.getElementById(
+            "razorpay-payment-id"
+        ).value = response.razorpay_payment_id;
+
+        document.getElementById(
+            "razorpay-order-id"
+        ).value = response.razorpay_order_id;
+
+        document.getElementById(
+            "razorpay-signature"
+        ).value = response.razorpay_signature;
+
+        document.getElementById(
+            "payment-verification-form"
+        ).submit();
+
+    },
+
+    modal: {
+
+        ondismiss: function () {
+
+            console.log("Payment window closed.");
+
+        }
+
+    }
+
+};
+
+const razorpayCheckout = new Razorpay(options);
+
+razorpayCheckout.on(
+    "payment.failed",
+    function (response) {
+
+        alert(
+            response.error.description ||
+            "Payment failed. Please try again."
+        );
+
+    }
+);
+
+document.getElementById(
+    "pay-button"
+).addEventListener(
+    "click",
+    function (event) {
+
+        razorpayCheckout.open();
+
+        event.preventDefault();
+
+    }
+);
+
+</script>
+
+{% endblock %}

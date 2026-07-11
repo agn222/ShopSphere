@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Order Confirmation</title>
+</head>
+
+<body
+    style="
+        margin: 0;
+        padding: 0;
+        background-color: #f3f4f6;
+        font-family: Arial, sans-serif;
+        color: #111827;
+    "
+>
+    <table
+        role="presentation"
+        width="100%"
+        cellspacing="0"
+        cellpadding="0"
+        style="background-color: #f3f4f6; padding: 32px 12px;"
+    >
+        <tr>
+            <td align="center">
+
+                <table
+                    role="presentation"
+                    width="100%"
+                    cellspacing="0"
+                    cellpadding="0"
+                    style="
+                        max-width: 640px;
+                        background-color: #ffffff;
+                        border-radius: 16px;
+                        overflow: hidden;
+                    "
+                >
+                    <tr>
+                        <td
+                            style="
+                                background-color: #2563eb;
+                                color: #ffffff;
+                                padding: 28px;
+                                text-align: center;
+                            "
+                        >
+                            <h1 style="margin: 0; font-size: 28px;">
+                                ShopSphere
+                            </h1>
+
+                            <p style="margin: 10px 0 0;">
+                                Payment successful
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding: 32px;">
+
+                            <h2 style="margin-top: 0;">
+                                Order confirmed
+                            </h2>
+
+                            <p>
+                                Hi {{ order.first_name }},
+                            </p>
+
+                            <p style="line-height: 1.6; color: #4b5563;">
+                                Thank you for shopping with ShopSphere.
+                                Your payment was successful and
+                                Order <strong>#{{ order.id }}</strong>
+                                has been confirmed.
+                            </p>
+
+                            <table
+                                role="presentation"
+                                width="100%"
+                                cellspacing="0"
+                                cellpadding="0"
+                                style="
+                                    margin-top: 24px;
+                                    border-collapse: collapse;
+                                "
+                            >
+                                <tr>
+                                    <td
+                                        colspan="2"
+                                        style="
+                                            padding: 12px 0;
+                                            border-bottom: 2px solid #e5e7eb;
+                                            font-weight: bold;
+                                        "
+                                    >
+                                        Order items
+                                    </td>
+                                </tr>
+
+                                {% for item in items %}
+                                    <tr>
+                                        <td
+                                            style="
+                                                padding: 14px 0;
+                                                border-bottom: 1px solid #e5e7eb;
+                                            "
+                                        >
+                                            <strong>
+                                                {{ item.product_name }}
+                                            </strong>
+
+                                            <br>
+
+                                            <span
+                                                style="
+                                                    color: #6b7280;
+                                                    font-size: 14px;
+                                                "
+                                            >
+                                                ₹{{ item.price }}
+                                                × {{ item.quantity }}
+                                            </span>
+                                        </td>
+
+                                        <td
+                                            align="right"
+                                            style="
+                                                padding: 14px 0;
+                                                border-bottom: 1px solid #e5e7eb;
+                                                font-weight: bold;
+                                            "
+                                        >
+                                            ₹{{ item.get_cost }}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </table>
+
+                            <table
+                                role="presentation"
+                                width="100%"
+                                cellspacing="0"
+                                cellpadding="0"
+                                style="margin-top: 20px;"
+                            >
+                                <tr>
+                                    <td style="padding: 6px 0; color: #6b7280;">
+                                        Subtotal
+                                    </td>
+
+                                    <td
+                                        align="right"
+                                        style="padding: 6px 0;"
+                                    >
+                                        ₹{{ order.get_subtotal }}
+                                    </td>
+                                </tr>
+
+                                {% if order.discount > 0 %}
+                                    <tr>
+                                        <td
+                                            style="
+                                                padding: 6px 0;
+                                                color: #15803d;
+                                            "
+                                        >
+                                            Coupon {{ order.coupon_code }}
+                                        </td>
+
+                                        <td
+                                            align="right"
+                                            style="
+                                                padding: 6px 0;
+                                                color: #15803d;
+                                            "
+                                        >
+                                            -₹{{ order.discount }}
+                                        </td>
+                                    </tr>
+                                {% endif %}
+
+                                <tr>
+                                    <td
+                                        style="
+                                            padding: 14px 0 6px;
+                                            border-top: 1px solid #e5e7eb;
+                                            font-size: 20px;
+                                            font-weight: bold;
+                                        "
+                                    >
+                                        Total paid
+                                    </td>
+
+                                    <td
+                                        align="right"
+                                        style="
+                                            padding: 14px 0 6px;
+                                            border-top: 1px solid #e5e7eb;
+                                            font-size: 20px;
+                                            font-weight: bold;
+                                        "
+                                    >
+                                        ₹{{ order.get_total_price }}
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <div
+                                style="
+                                    margin-top: 26px;
+                                    padding: 18px;
+                                    background-color: #f9fafb;
+                                    border-radius: 10px;
+                                "
+                            >
+                                <h3 style="margin: 0 0 10px;">
+                                    Delivery address
+                                </h3>
+
+                                <p
+                                    style="
+                                        margin: 0;
+                                        color: #4b5563;
+                                        line-height: 1.6;
+                                    "
+                                >
+                                    {{ order.first_name }}
+                                    {{ order.last_name }}<br>
+
+                                    {{ order.address_line_1 }}<br>
+
+                                    {% if order.address_line_2 %}
+                                        {{ order.address_line_2 }}<br>
+                                    {% endif %}
+
+                                    {{ order.city }},
+                                    {{ order.state }}
+                                    - {{ order.postal_code }}<br>
+
+                                    {{ order.country }}
+                                </p>
+                            </div>
+
+                            <p
+                                style="
+                                    margin-top: 26px;
+                                    line-height: 1.6;
+                                    color: #4b5563;
+                                "
+                            >
+                                We will notify you when your order
+                                is shipped.
+                            </p>
+
+                            <p style="margin-bottom: 0;">
+                                Thank you,<br>
+                                <strong>ShopSphere Team</strong>
+                            </p>
+
+                        </td>
+                    </tr>
+                </table>
+
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

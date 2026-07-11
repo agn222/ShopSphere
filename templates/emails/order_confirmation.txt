@@ -1,0 +1,32 @@
+ShopSphere - Order Confirmation
+
+Hi {{ order.first_name }},
+
+Thank you for shopping with ShopSphere.
+
+Your payment was successful and Order #{{ order.id }} has been confirmed.
+
+Order items:
+{% for item in items %}
+- {{ item.product_name }} × {{ item.quantity }}: ₹{{ item.get_cost }}
+{% endfor %}
+
+Subtotal: ₹{{ order.get_subtotal }}
+{% if order.discount > 0 %}
+Coupon {{ order.coupon_code }}: -₹{{ order.discount }}
+{% endif %}
+Total paid: ₹{{ order.get_total_price }}
+
+Delivery address:
+{{ order.address_line_1 }}
+{% if order.address_line_2 %}{{ order.address_line_2 }}
+{% endif %}{{ order.city }}, {{ order.state }} - {{ order.postal_code }}
+{{ order.country }}
+
+Payment status: Paid
+Order status: {{ order.get_status_display }}
+
+We will notify you when your order is shipped.
+
+Thank you,
+ShopSphere Team
