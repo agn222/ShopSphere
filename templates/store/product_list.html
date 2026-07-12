@@ -302,17 +302,19 @@
 
                         {% if product.image %}
 
-                            <img
-                                src="{{ product.image.url }}"
-                                alt="{{ product.name }}"
-                                class="h-56 w-full object-cover"
-                            >
+                            <div class="aspect-[4/3] overflow-hidden bg-white">
+    <img
+        src="{{ product.image.url }}"
+        alt="{{ product.name }}"
+        class="h-full w-full object-contain p-3 transition duration-300 hover:scale-105"
+    >
+</div>
 
                         {% else %}
 
-                            <div class="flex h-56 items-center justify-center bg-gray-200 text-gray-500">
-                                No image
-                            </div>
+                            <div class="flex aspect-[4/3] items-center justify-center bg-slate-100 text-slate-500">
+    No image
+</div>
 
                         {% endif %}
 
