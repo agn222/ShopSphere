@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,129 +10,990 @@
         content="width=device-width, initial-scale=1.0"
     >
 
+    <meta
+        name="description"
+        content="ShopSphere - Discover quality products at great prices."
+    >
+
     <title>
         {% block title %}
             ShopSphere
         {% endblock %}
     </title>
 
+    <!-- Google Font -->
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ["Inter", "sans-serif"]
+                    },
+
+                    colors: {
+                        brand: {
+                            50: "#eff6ff",
+                            100: "#dbeafe",
+                            500: "#3b82f6",
+                            600: "#2563eb",
+                            700: "#1d4ed8",
+                            900: "#1e3a8a"
+                        }
+                    },
+
+                    boxShadow: {
+                        soft: "0 10px 30px rgba(15, 23, 42, 0.08)",
+                        premium: "0 20px 60px rgba(15, 23, 42, 0.12)"
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: "Inter", sans-serif;
+        }
+
+        ::selection {
+            background: #2563eb;
+            color: white;
+        }
+
+        .page-enter {
+            animation: pageEnter 0.45s ease-out;
+        }
+
+        @keyframes pageEnter {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message-progress {
+            animation: messageProgress 5s linear forwards;
+        }
+
+        @keyframes messageProgress {
+            from {
+                width: 100%;
+            }
+
+            to {
+                width: 0%;
+            }
+        }
+    </style>
+
+    {% block extra_head %}
+    {% endblock %}
 </head>
 
-<body class="min-h-screen bg-gray-50 text-gray-900">
+<body class="min-h-screen bg-slate-50 text-slate-900 antialiased">
 
-    <nav class="border-b bg-white shadow-sm">
+    <!-- Top offer bar -->
+    <div class="bg-slate-950 text-white">
         <div
-            class="mx-auto flex max-w-7xl items-center justify-between px-6 py-4"
+            class="mx-auto flex max-w-7xl items-center justify-center px-4 py-2 text-center text-xs font-medium sm:text-sm"
         >
-            <a
-                href="{% url 'store:product_list' %}"
-                class="text-2xl font-bold text-blue-600"
-                
-            >
-            Shopsphere
-                
-            </a>
+            <i
+                data-lucide="truck"
+                class="mr-2 h-4 w-4"
+            ></i>
 
-            <div class="flex items-center gap-6">
+            Free delivery on selected orders
+
+            <span class="mx-3 hidden text-slate-500 sm:inline">
+                |
+            </span>
+
+            <span class="hidden sm:inline">
+                Secure payments powered by Razorpay
+            </span>
+        </div>
+    </div>
+
+
+    <!-- Main navbar -->
+    <header
+        class="sticky top-0 z-50 border-b border-slate-200/80 bg-white/90 shadow-sm backdrop-blur-xl"
+    >
+        <nav class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+
+            <div class="flex h-18 items-center justify-between py-4">
+
+                <!-- Logo -->
                 <a
                     href="{% url 'store:product_list' %}"
-                    class="font-medium hover:text-blue-600"
+                    class="group flex items-center gap-3"
                 >
-                    Products
+                    <div
+                        class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-lg shadow-blue-500/20 transition group-hover:scale-105"
+                    >
+                        <i
+                            data-lucide="shopping-bag"
+                            class="h-6 w-6"
+                        ></i>
+                    </div>
+
+                    <div>
+                        <p class="text-xl font-extrabold tracking-tight text-slate-950">
+                            Shop<span class="text-blue-600">Sphere</span>
+                        </p>
+
+                        <p class="hidden text-[10px] font-medium uppercase tracking-[0.2em] text-slate-400 sm:block">
+                            Shop smarter
+                        </p>
+                    </div>
                 </a>
 
-                <a
-    href="{% url 'cart:cart_detail' %}"
-    class="font-medium hover:text-blue-600"
->
-    Cart
 
-    {% if cart|length > 0 %}
-        <span
-            class="ml-1 rounded-full bg-blue-600 px-2 py-1 text-xs text-white"
-        >
-            {{ cart|length }}
-        </span>
-    {% endif %}
-</a>
+                <!-- Desktop navigation -->
+                <div class="hidden items-center gap-7 lg:flex">
 
-                {% if user.is_authenticated %}
-                <a
-    href="{% url 'orders:order_history' %}"
-    class="font-medium hover:text-blue-600"
->
-    My Orders
-</a>
-<a
-    href="{% url 'accounts:wishlist' %}"
-    class="font-medium hover:text-blue-600"
->
-    Wishlist
-</a>
+                    <a
+                        href="{% url 'store:product_list' %}"
+                        class="group relative flex items-center gap-2 text-sm font-semibold text-slate-600 transition hover:text-blue-600"
+                    >
+                        <i
+                            data-lucide="store"
+                            class="h-4 w-4"
+                        ></i>
 
-    <a
-        href="{% url 'accounts:profile' %}"
-        class="font-medium hover:text-blue-600"
-    >
-        Hi, {{ user.first_name|default:user.username }}
-    </a>
+                        Products
 
-    <form
-        method="post"
-        action="{% url 'accounts:logout' %}"
-    >
-        {% csrf_token %}
+                        <span
+                            class="absolute -bottom-2 left-0 h-0.5 w-0 bg-blue-600 transition-all group-hover:w-full"
+                        ></span>
+                    </a>
 
-        <button
-            type="submit"
-            class="rounded-lg bg-gray-900 px-4 py-2 font-medium text-white hover:bg-gray-700"
-        >
-            Logout
-        </button>
-    </form>
 
-{% else %}
+                    {% if user.is_authenticated %}
 
-    <a
-        href="{% url 'accounts:login' %}"
-        class="font-medium hover:text-blue-600"
-    >
-        Login
-    </a>
+                        <a
+                            href="{% url 'accounts:wishlist' %}"
+                            class="group relative flex items-center gap-2 text-sm font-semibold text-slate-600 transition hover:text-pink-600"
+                        >
+                            <i
+                                data-lucide="heart"
+                                class="h-4 w-4"
+                            ></i>
 
-    <a
-        href="{% url 'accounts:register' %}"
-        class="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700"
-    >
-        Register
-    </a>
+                            Wishlist
 
-{% endif %}
-            </div>
-        </div>
-    </nav>
+                            <span
+                                class="absolute -bottom-2 left-0 h-0.5 w-0 bg-pink-600 transition-all group-hover:w-full"
+                            ></span>
+                        </a>
 
-    {% if messages %}
-        <div class="mx-auto mt-4 max-w-7xl px-6">
-            {% for message in messages %}
-                <div class="rounded-lg bg-green-100 px-4 py-3 text-green-800">
-                    {{ message }}
+
+                        <a
+                            href="{% url 'orders:order_history' %}"
+                            class="group relative flex items-center gap-2 text-sm font-semibold text-slate-600 transition hover:text-blue-600"
+                        >
+                            <i
+                                data-lucide="package"
+                                class="h-4 w-4"
+                            ></i>
+
+                            My Orders
+
+                            <span
+                                class="absolute -bottom-2 left-0 h-0.5 w-0 bg-blue-600 transition-all group-hover:w-full"
+                            ></span>
+                        </a>
+
+                    {% endif %}
+
                 </div>
+
+
+                <!-- Right controls -->
+                <div class="flex items-center gap-2 sm:gap-3">
+
+                    <!-- Cart -->
+                    <a
+                        href="{% url 'cart:cart_detail' %}"
+                        class="relative flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
+                        aria-label="Shopping cart"
+                    >
+                        <i
+                            data-lucide="shopping-cart"
+                            class="h-5 w-5"
+                        ></i>
+
+                        {% if cart|length > 0 %}
+                            <span
+                                class="absolute -right-2 -top-2 flex h-6 min-w-6 items-center justify-center rounded-full bg-blue-600 px-1.5 text-xs font-bold text-white shadow"
+                            >
+                                {{ cart|length }}
+                            </span>
+                        {% endif %}
+                    </a>
+
+
+                    {% if user.is_authenticated %}
+
+                        <!-- Desktop profile dropdown -->
+                        <div class="relative hidden sm:block">
+
+                            <button
+                                id="profile-menu-button"
+                                type="button"
+                                class="flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 py-2 transition hover:border-blue-200 hover:bg-blue-50"
+                            >
+                                <div
+                                    class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-indigo-700 text-sm font-bold text-white"
+                                >
+                                    {{ user.first_name|default:user.username|slice:":1"|upper }}
+                                </div>
+
+                                <div class="hidden text-left md:block">
+                                    <p class="max-w-28 truncate text-sm font-semibold text-slate-800">
+                                        {{ user.first_name|default:user.username }}
+                                    </p>
+
+                                    <p class="text-xs text-slate-400">
+                                        My account
+                                    </p>
+                                </div>
+
+                                <i
+                                    data-lucide="chevron-down"
+                                    class="h-4 w-4 text-slate-400"
+                                ></i>
+                            </button>
+
+
+                            <div
+                                id="profile-menu"
+                                class="absolute right-0 mt-3 hidden w-60 overflow-hidden rounded-2xl border border-slate-200 bg-white p-2 shadow-premium"
+                            >
+                                <div class="border-b border-slate-100 px-3 py-3">
+                                    <p class="font-semibold text-slate-900">
+                                        {{ user.get_full_name|default:user.username }}
+                                    </p>
+
+                                    <p class="mt-1 truncate text-xs text-slate-500">
+                                        {{ user.email }}
+                                    </p>
+                                </div>
+
+
+                                <a
+                                    href="{% url 'accounts:profile' %}"
+                                    class="mt-2 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-blue-50 hover:text-blue-600"
+                                >
+                                    <i
+                                        data-lucide="user"
+                                        class="h-4 w-4"
+                                    ></i>
+
+                                    My Profile
+                                </a>
+
+
+                                <a
+                                    href="{% url 'orders:order_history' %}"
+                                    class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-blue-50 hover:text-blue-600"
+                                >
+                                    <i
+                                        data-lucide="package"
+                                        class="h-4 w-4"
+                                    ></i>
+
+                                    My Orders
+                                </a>
+
+
+                                <a
+                                    href="{% url 'accounts:wishlist' %}"
+                                    class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-pink-50 hover:text-pink-600"
+                                >
+                                    <i
+                                        data-lucide="heart"
+                                        class="h-4 w-4"
+                                    ></i>
+
+                                    Wishlist
+                                </a>
+
+
+                                <form
+                                    method="post"
+                                    action="{% url 'accounts:logout' %}"
+                                    class="mt-2 border-t border-slate-100 pt-2"
+                                >
+                                    {% csrf_token %}
+
+                                    <button
+                                        type="submit"
+                                        class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-red-600 transition hover:bg-red-50"
+                                    >
+                                        <i
+                                            data-lucide="log-out"
+                                            class="h-4 w-4"
+                                        ></i>
+
+                                        Logout
+                                    </button>
+                                </form>
+                            </div>
+
+                        </div>
+
+                    {% else %}
+
+                        <a
+                            href="{% url 'accounts:login' %}"
+                            class="hidden rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 sm:block"
+                        >
+                            Login
+                        </a>
+
+                        <a
+                            href="{% url 'accounts:register' %}"
+                            class="hidden rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-500/20 transition hover:-translate-y-0.5 hover:bg-blue-700 sm:block"
+                        >
+                            Register
+                        </a>
+
+                    {% endif %}
+
+
+                    <!-- Mobile menu button -->
+                    <button
+                        id="mobile-menu-button"
+                        type="button"
+                        class="flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 lg:hidden"
+                        aria-label="Open navigation menu"
+                    >
+                        <i
+                            data-lucide="menu"
+                            class="h-5 w-5"
+                        ></i>
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- Mobile navigation -->
+            <div
+                id="mobile-menu"
+                class="hidden border-t border-slate-100 py-4 lg:hidden"
+            >
+                <div class="space-y-2">
+
+                    <a
+                        href="{% url 'store:product_list' %}"
+                        class="flex items-center gap-3 rounded-xl px-4 py-3 font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600"
+                    >
+                        <i
+                            data-lucide="store"
+                            class="h-5 w-5"
+                        ></i>
+
+                        Products
+                    </a>
+
+
+                    <a
+                        href="{% url 'cart:cart_detail' %}"
+                        class="flex items-center justify-between rounded-xl px-4 py-3 font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600"
+                    >
+                        <span class="flex items-center gap-3">
+                            <i
+                                data-lucide="shopping-cart"
+                                class="h-5 w-5"
+                            ></i>
+
+                            Cart
+                        </span>
+
+                        {% if cart|length > 0 %}
+                            <span class="rounded-full bg-blue-600 px-2 py-1 text-xs font-bold text-white">
+                                {{ cart|length }}
+                            </span>
+                        {% endif %}
+                    </a>
+
+
+                    {% if user.is_authenticated %}
+
+                        <a
+                            href="{% url 'accounts:wishlist' %}"
+                            class="flex items-center gap-3 rounded-xl px-4 py-3 font-medium text-slate-700 hover:bg-pink-50 hover:text-pink-600"
+                        >
+                            <i
+                                data-lucide="heart"
+                                class="h-5 w-5"
+                            ></i>
+
+                            Wishlist
+                        </a>
+
+
+                        <a
+                            href="{% url 'orders:order_history' %}"
+                            class="flex items-center gap-3 rounded-xl px-4 py-3 font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600"
+                        >
+                            <i
+                                data-lucide="package"
+                                class="h-5 w-5"
+                            ></i>
+
+                            My Orders
+                        </a>
+
+
+                        <a
+                            href="{% url 'accounts:profile' %}"
+                            class="flex items-center gap-3 rounded-xl px-4 py-3 font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600"
+                        >
+                            <i
+                                data-lucide="user"
+                                class="h-5 w-5"
+                            ></i>
+
+                            My Profile
+                        </a>
+
+
+                        <form
+                            method="post"
+                            action="{% url 'accounts:logout' %}"
+                        >
+                            {% csrf_token %}
+
+                            <button
+                                type="submit"
+                                class="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left font-semibold text-red-600 hover:bg-red-50"
+                            >
+                                <i
+                                    data-lucide="log-out"
+                                    class="h-5 w-5"
+                                ></i>
+
+                                Logout
+                            </button>
+                        </form>
+
+                    {% else %}
+
+                        <a
+                            href="{% url 'accounts:login' %}"
+                            class="flex items-center gap-3 rounded-xl px-4 py-3 font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600"
+                        >
+                            <i
+                                data-lucide="log-in"
+                                class="h-5 w-5"
+                            ></i>
+
+                            Login
+                        </a>
+
+
+                        <a
+                            href="{% url 'accounts:register' %}"
+                            class="mt-2 block rounded-xl bg-blue-600 px-4 py-3 text-center font-semibold text-white hover:bg-blue-700"
+                        >
+                            Create Account
+                        </a>
+
+                    {% endif %}
+
+                </div>
+            </div>
+
+        </nav>
+    </header>
+
+
+    <!-- Django messages -->
+    {% if messages %}
+        <div
+            id="messages-container"
+            class="fixed right-4 top-28 z-[60] w-[calc(100%-2rem)] max-w-sm space-y-3"
+        >
+            {% for message in messages %}
+
+                <div
+                    class="message-item relative overflow-hidden rounded-2xl border bg-white p-4 shadow-premium
+                    {% if message.tags == 'success' %}
+                        border-green-200
+                    {% elif message.tags == 'error' %}
+                        border-red-200
+                    {% elif message.tags == 'warning' %}
+                        border-amber-200
+                    {% else %}
+                        border-blue-200
+                    {% endif %}"
+                >
+                    <div class="flex items-start gap-3">
+
+                        <div
+                            class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full
+                            {% if message.tags == 'success' %}
+                                bg-green-100 text-green-600
+                            {% elif message.tags == 'error' %}
+                                bg-red-100 text-red-600
+                            {% elif message.tags == 'warning' %}
+                                bg-amber-100 text-amber-600
+                            {% else %}
+                                bg-blue-100 text-blue-600
+                            {% endif %}"
+                        >
+                            {% if message.tags == 'success' %}
+                                <i data-lucide="check-circle" class="h-5 w-5"></i>
+                            {% elif message.tags == 'error' %}
+                                <i data-lucide="x-circle" class="h-5 w-5"></i>
+                            {% elif message.tags == 'warning' %}
+                                <i data-lucide="alert-triangle" class="h-5 w-5"></i>
+                            {% else %}
+                                <i data-lucide="info" class="h-5 w-5"></i>
+                            {% endif %}
+                        </div>
+
+                        <div class="flex-1">
+                            <p class="text-sm font-semibold text-slate-800">
+                                {{ message }}
+                            </p>
+                        </div>
+
+                        <button
+                            type="button"
+                            class="close-message text-slate-400 hover:text-slate-700"
+                        >
+                            <i
+                                data-lucide="x"
+                                class="h-4 w-4"
+                            ></i>
+                        </button>
+
+                    </div>
+
+                    <div
+                        class="message-progress absolute bottom-0 left-0 h-1
+                        {% if message.tags == 'success' %}
+                            bg-green-500
+                        {% elif message.tags == 'error' %}
+                            bg-red-500
+                        {% elif message.tags == 'warning' %}
+                            bg-amber-500
+                        {% else %}
+                            bg-blue-500
+                        {% endif %}"
+                    ></div>
+                </div>
+
             {% endfor %}
         </div>
     {% endif %}
 
-    <main class="mx-auto max-w-7xl px-6 py-10">
-        {% block content %}
-        {% endblock %}
+
+    <!-- Main content -->
+    <main class="page-enter min-h-[65vh]">
+
+        <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
+            {% block content %}
+            {% endblock %}
+        </div>
+
     </main>
 
-    <footer class="mt-12 border-t bg-white">
-        <div class="mx-auto max-w-7xl px-6 py-6 text-center text-gray-500">
-            © 2026 ShopSphere. Built with Django and Tailwind CSS.
+
+    <!-- Benefits section -->
+    <section class="border-y border-slate-200 bg-white">
+
+        <div class="mx-auto grid max-w-7xl gap-6 px-4 py-10 sm:grid-cols-2 sm:px-6 lg:grid-cols-4 lg:px-8">
+
+            <div class="flex items-center gap-4">
+                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
+                    <i data-lucide="truck" class="h-6 w-6"></i>
+                </div>
+
+                <div>
+                    <h3 class="font-bold text-slate-900">
+                        Fast Delivery
+                    </h3>
+
+                    <p class="mt-1 text-sm text-slate-500">
+                        Reliable order delivery
+                    </p>
+                </div>
+            </div>
+
+
+            <div class="flex items-center gap-4">
+                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-green-50 text-green-600">
+                    <i data-lucide="shield-check" class="h-6 w-6"></i>
+                </div>
+
+                <div>
+                    <h3 class="font-bold text-slate-900">
+                        Secure Payment
+                    </h3>
+
+                    <p class="mt-1 text-sm text-slate-500">
+                        Razorpay protected checkout
+                    </p>
+                </div>
+            </div>
+
+
+            <div class="flex items-center gap-4">
+                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-purple-50 text-purple-600">
+                    <i data-lucide="badge-check" class="h-6 w-6"></i>
+                </div>
+
+                <div>
+                    <h3 class="font-bold text-slate-900">
+                        Quality Products
+                    </h3>
+
+                    <p class="mt-1 text-sm text-slate-500">
+                        Carefully selected items
+                    </p>
+                </div>
+            </div>
+
+
+            <div class="flex items-center gap-4">
+                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-orange-50 text-orange-600">
+                    <i data-lucide="headphones" class="h-6 w-6"></i>
+                </div>
+
+                <div>
+                    <h3 class="font-bold text-slate-900">
+                        Customer Support
+                    </h3>
+
+                    <p class="mt-1 text-sm text-slate-500">
+                        We are here to help
+                    </p>
+                </div>
+            </div>
+
         </div>
+
+    </section>
+
+
+    <!-- Footer -->
+    <footer class="bg-slate-950 text-slate-300">
+
+        <div class="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+
+            <div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+
+                <!-- Brand -->
+                <div>
+                    <a
+                        href="{% url 'store:product_list' %}"
+                        class="flex items-center gap-3"
+                    >
+                        <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-600 text-white">
+                            <i data-lucide="shopping-bag" class="h-6 w-6"></i>
+                        </div>
+
+                        <span class="text-xl font-extrabold text-white">
+                            Shop<span class="text-blue-500">Sphere</span>
+                        </span>
+                    </a>
+
+                    <p class="mt-5 max-w-sm text-sm leading-7 text-slate-400">
+                        A modern e-commerce platform built using Django,
+                        PostgreSQL, Tailwind CSS, Cloudinary and Razorpay.
+                    </p>
+
+                    <div class="mt-6 flex gap-3">
+                        <a
+                            href="#"
+                            class="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-900 text-slate-400 transition hover:bg-blue-600 hover:text-white"
+                            aria-label="GitHub"
+                        >
+                            <i data-lucide="github" class="h-5 w-5"></i>
+                        </a>
+
+                        <a
+                            href="#"
+                            class="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-900 text-slate-400 transition hover:bg-blue-600 hover:text-white"
+                            aria-label="LinkedIn"
+                        >
+                            <i data-lucide="linkedin" class="h-5 w-5"></i>
+                        </a>
+
+                        <a
+                            href="mailto:{{ DEFAULT_FROM_EMAIL|default:'support@shopsphere.com' }}"
+                            class="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-900 text-slate-400 transition hover:bg-blue-600 hover:text-white"
+                            aria-label="Email"
+                        >
+                            <i data-lucide="mail" class="h-5 w-5"></i>
+                        </a>
+                    </div>
+                </div>
+
+
+                <!-- Shop -->
+                <div>
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-white">
+                        Shop
+                    </h3>
+
+                    <div class="mt-5 space-y-3 text-sm">
+                        <a
+                            href="{% url 'store:product_list' %}"
+                            class="block transition hover:translate-x-1 hover:text-white"
+                        >
+                            All Products
+                        </a>
+
+                        {% if user.is_authenticated %}
+                            <a
+                                href="{% url 'accounts:wishlist' %}"
+                                class="block transition hover:translate-x-1 hover:text-white"
+                            >
+                                Wishlist
+                            </a>
+
+                            <a
+                                href="{% url 'orders:order_history' %}"
+                                class="block transition hover:translate-x-1 hover:text-white"
+                            >
+                                My Orders
+                            </a>
+                        {% endif %}
+
+                        <a
+                            href="{% url 'cart:cart_detail' %}"
+                            class="block transition hover:translate-x-1 hover:text-white"
+                        >
+                            Shopping Cart
+                        </a>
+                    </div>
+                </div>
+
+
+                <!-- Account -->
+                <div>
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-white">
+                        Account
+                    </h3>
+
+                    <div class="mt-5 space-y-3 text-sm">
+
+                        {% if user.is_authenticated %}
+                            <a
+                                href="{% url 'accounts:profile' %}"
+                                class="block transition hover:translate-x-1 hover:text-white"
+                            >
+                                My Profile
+                            </a>
+
+                            <a
+                                href="{% url 'orders:order_history' %}"
+                                class="block transition hover:translate-x-1 hover:text-white"
+                            >
+                                Track Orders
+                            </a>
+                        {% else %}
+                            <a
+                                href="{% url 'accounts:login' %}"
+                                class="block transition hover:translate-x-1 hover:text-white"
+                            >
+                                Login
+                            </a>
+
+                            <a
+                                href="{% url 'accounts:register' %}"
+                                class="block transition hover:translate-x-1 hover:text-white"
+                            >
+                                Create Account
+                            </a>
+                        {% endif %}
+
+                    </div>
+                </div>
+
+
+                <!-- Newsletter -->
+                <div>
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-white">
+                        Stay Updated
+                    </h3>
+
+                    <p class="mt-5 text-sm leading-6 text-slate-400">
+                        Get updates about new products and special offers.
+                    </p>
+
+                    <form
+                        class="mt-5"
+                        onsubmit="event.preventDefault();"
+                    >
+                        <div class="flex overflow-hidden rounded-xl border border-slate-800 bg-slate-900">
+                            <input
+                                type="email"
+                                placeholder="Email address"
+                                class="min-w-0 flex-1 bg-transparent px-4 py-3 text-sm text-white outline-none placeholder:text-slate-500"
+                            >
+
+                            <button
+                                type="submit"
+                                class="bg-blue-600 px-4 text-white transition hover:bg-blue-700"
+                                aria-label="Subscribe"
+                            >
+                                <i
+                                    data-lucide="send"
+                                    class="h-5 w-5"
+                                ></i>
+                            </button>
+                        </div>
+                    </form>
+
+                    <p class="mt-3 text-xs text-slate-500">
+                        No spam. Unsubscribe anytime.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div
+                class="mt-12 flex flex-col gap-4 border-t border-slate-800 pt-8 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between"
+            >
+                <p>
+                    © {% now "Y" %} ShopSphere. All rights reserved.
+                </p>
+
+                <div class="flex flex-wrap gap-5">
+                    <a href="#" class="hover:text-white">
+                        Privacy Policy
+                    </a>
+
+                    <a href="#" class="hover:text-white">
+                        Terms
+                    </a>
+
+                    <a href="#" class="hover:text-white">
+                        Contact
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
     </footer>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            lucide.createIcons();
+
+            const mobileMenuButton =
+                document.getElementById("mobile-menu-button");
+
+            const mobileMenu =
+                document.getElementById("mobile-menu");
+
+            if (mobileMenuButton && mobileMenu) {
+                mobileMenuButton.addEventListener("click", function () {
+                    mobileMenu.classList.toggle("hidden");
+                });
+            }
+
+            const profileMenuButton =
+                document.getElementById("profile-menu-button");
+
+            const profileMenu =
+                document.getElementById("profile-menu");
+
+            if (profileMenuButton && profileMenu) {
+                profileMenuButton.addEventListener(
+                    "click",
+                    function (event) {
+                        event.stopPropagation();
+                        profileMenu.classList.toggle("hidden");
+                    }
+                );
+
+                document.addEventListener("click", function () {
+                    profileMenu.classList.add("hidden");
+                });
+
+                profileMenu.addEventListener(
+                    "click",
+                    function (event) {
+                        event.stopPropagation();
+                    }
+                );
+            }
+
+            document
+                .querySelectorAll(".close-message")
+                .forEach(function (button) {
+                    button.addEventListener(
+                        "click",
+                        function () {
+                            button.closest(".message-item").remove();
+                        }
+                    );
+                });
+
+            setTimeout(function () {
+                document
+                    .querySelectorAll(".message-item")
+                    .forEach(function (message) {
+                        message.style.transition =
+                            "opacity 0.3s, transform 0.3s";
+
+                        message.style.opacity = "0";
+                        message.style.transform =
+                            "translateX(20px)";
+
+                        setTimeout(function () {
+                            message.remove();
+                        }, 300);
+                    });
+            }, 5000);
+        });
+    </script>
+
+    {% block extra_js %}
+    {% endblock %}
 
 </body>
 </html>
