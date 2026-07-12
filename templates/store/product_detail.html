@@ -4,204 +4,495 @@
     {{ product.name }} | ShopSphere
 {% endblock %}
 
+
+{% block extra_head %}
+
+<style>
+    .product-image {
+        transition:
+            transform 0.45s ease,
+            filter 0.45s ease;
+    }
+
+    .product-image-wrapper:hover .product-image {
+        transform: scale(1.06);
+    }
+
+    .review-card {
+        transition:
+            transform 0.25s ease,
+            box-shadow 0.25s ease,
+            border-color 0.25s ease;
+    }
+
+    .review-card:hover {
+        transform: translateY(-3px);
+        border-color: #bfdbfe;
+        box-shadow: 0 16px 35px rgba(15, 23, 42, 0.08);
+    }
+</style>
+
+{% endblock %}
+
+
 {% block content %}
 
-<div class="mb-6 text-sm text-gray-500">
+<!-- Breadcrumb -->
+<nav
+    class="mb-6 flex flex-wrap items-center gap-2 text-sm text-slate-500"
+    aria-label="Breadcrumb"
+>
     <a
         href="{% url 'store:product_list' %}"
-        class="hover:text-blue-600"
+        class="flex items-center gap-1.5 font-medium transition hover:text-blue-600"
     >
+        <i
+            data-lucide="home"
+            class="h-4 w-4"
+        ></i>
+
         Products
     </a>
 
-    <span class="mx-2">/</span>
+    <i
+        data-lucide="chevron-right"
+        class="h-4 w-4 text-slate-300"
+    ></i>
 
     <a
         href="{{ product.category.get_absolute_url }}"
-        class="hover:text-blue-600"
+        class="font-medium transition hover:text-blue-600"
     >
         {{ product.category.name }}
     </a>
 
-    <span class="mx-2">/</span>
+    <i
+        data-lucide="chevron-right"
+        class="h-4 w-4 text-slate-300"
+    ></i>
 
-    <span>
+    <span class="max-w-xs truncate font-medium text-slate-700">
         {{ product.name }}
     </span>
-</div>
+</nav>
 
 
-<div class="grid gap-8 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6 lg:grid-cols-2 lg:p-8">
-
-    <div>
-        {% if product.image %}
-            <div class="flex aspect-square items-center justify-center overflow-hidden rounded-2xl bg-white p-4">
-    <img
-        src="{{ product.image.url }}"
-        alt="{{ product.name }}"
-        class="max-h-full max-w-full object-contain"
-    >
-</div>
-        {% else %}
-            <div
-    class="flex aspect-square items-center justify-center rounded-2xl bg-slate-100 text-slate-500"
+<!-- Main product section -->
+<section
+    class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-soft"
 >
-    No image available
-</div>
-        {% endif %}
-    </div>
+    <div class="grid lg:grid-cols-2">
 
+        <!-- Product image -->
+        <div
+            class="product-image-wrapper relative flex min-h-[360px] items-center justify-center overflow-hidden bg-gradient-to-br from-slate-50 via-white to-blue-50 p-5 sm:min-h-[500px] sm:p-10"
+        >
+            <div
+                class="absolute left-5 top-5 z-10 rounded-full bg-white/90 px-4 py-2 text-xs font-bold uppercase tracking-wider text-blue-600 shadow-sm backdrop-blur"
+            >
+                {{ product.category.name }}
+            </div>
 
-    <div class="flex flex-col justify-center">
-
-        <p class="font-semibold text-blue-600">
-            {{ product.category.name }}
-        </p>
-
-        <h1 class="mt-2 text-4xl font-bold">
-            {{ product.name }}
-        </h1>
-        <div class="mt-4 flex flex-wrap items-center gap-3">
-
-    <span class="text-xl text-yellow-500">
-        ★
-    </span>
-
-    <span class="font-bold">
-        {{ product.average_rating|floatformat:1 }}
-    </span>
-
-    <span class="text-gray-500">
-        Based on {{ product.review_count }}
-        review{{ product.review_count|pluralize }}
-    </span>
-
-</div>
-
-
-        <p class="mt-5 text-3xl font-bold">
-            ₹{{ product.price }}
-        </p>
-
-        <div class="mt-4">
             {% if product.stock > 0 %}
-                <span
-                    class="rounded-full bg-green-100 px-3 py-1 text-sm font-semibold text-green-700"
+                <div
+                    class="absolute right-5 top-5 z-10 flex items-center gap-1.5 rounded-full bg-green-100 px-3 py-2 text-xs font-bold text-green-700"
                 >
-                    {{ product.stock }} available
-                </span>
+                    <span class="h-2 w-2 rounded-full bg-green-500"></span>
+
+                    In Stock
+                </div>
             {% else %}
-                <span
-                    class="rounded-full bg-red-100 px-3 py-1 text-sm font-semibold text-red-700"
+                <div
+                    class="absolute right-5 top-5 z-10 rounded-full bg-red-100 px-3 py-2 text-xs font-bold text-red-700"
                 >
-                    Out of stock
-                </span>
+                    Out of Stock
+                </div>
+            {% endif %}
+
+            {% if product.image %}
+                <img
+                    src="{{ product.image.url }}"
+                    alt="{{ product.name }}"
+                    class="product-image max-h-[480px] w-full object-contain drop-shadow-xl"
+                >
+            {% else %}
+                <div
+                    class="flex aspect-square w-full max-w-md flex-col items-center justify-center rounded-3xl bg-slate-100 text-slate-400"
+                >
+                    <i
+                        data-lucide="image-off"
+                        class="h-14 w-14"
+                    ></i>
+
+                    <p class="mt-4 font-semibold">
+                        No image available
+                    </p>
+                </div>
             {% endif %}
         </div>
 
-        <p class="mt-6 leading-7 text-gray-600">
-            {{ product.description }}
+
+        <!-- Product information -->
+        <div class="flex flex-col justify-center p-6 sm:p-8 lg:p-10">
+
+            <div>
+                <a
+                    href="{{ product.category.get_absolute_url }}"
+                    class="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1.5 text-sm font-bold text-blue-600 transition hover:bg-blue-100"
+                >
+                    <i
+                        data-lucide="tag"
+                        class="h-4 w-4"
+                    ></i>
+
+                    {{ product.category.name }}
+                </a>
+
+                <h1
+                    class="mt-5 text-3xl font-extrabold leading-tight tracking-tight text-slate-950 sm:text-4xl lg:text-5xl"
+                >
+                    {{ product.name }}
+                </h1>
+
+
+                <!-- Rating -->
+                <div class="mt-5 flex flex-wrap items-center gap-3">
+
+                    <div
+                        class="flex items-center gap-2 rounded-full bg-amber-50 px-3 py-1.5"
+                    >
+                        <i
+                            data-lucide="star"
+                            class="h-4 w-4 fill-amber-400 text-amber-400"
+                        ></i>
+
+                        <span class="font-bold text-amber-700">
+                            {{ product.average_rating|floatformat:1 }}
+                        </span>
+                    </div>
+
+                    <a
+                        href="#reviews"
+                        class="text-sm font-medium text-slate-500 transition hover:text-blue-600"
+                    >
+                        {{ product.review_count }}
+                        review{{ product.review_count|pluralize }}
+                    </a>
+                </div>
+
+
+                <!-- Price -->
+                <div class="mt-7 flex flex-wrap items-end gap-3">
+
+                    <p class="text-4xl font-extrabold tracking-tight text-slate-950">
+                        ₹{{ product.price }}
+                    </p>
+
+                    <span class="mb-1 text-sm font-medium text-slate-400">
+                        Inclusive of all taxes
+                    </span>
+                </div>
+
+
+                <!-- Stock -->
+                <div class="mt-5">
+
+                    {% if product.stock > 0 %}
+                        <div
+                            class="inline-flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700"
+                        >
+                            <i
+                                data-lucide="check-circle"
+                                class="h-4 w-4"
+                            ></i>
+
+                            {{ product.stock }} unit{{ product.stock|pluralize }}
+                            available
+                        </div>
+                    {% else %}
+                        <div
+                            class="inline-flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700"
+                        >
+                            <i
+                                data-lucide="x-circle"
+                                class="h-4 w-4"
+                            ></i>
+
+                            Currently unavailable
+                        </div>
+                    {% endif %}
+
+                </div>
+
+
+                <!-- Description -->
+                <div class="mt-7 border-y border-slate-100 py-6">
+
+                    <h2
+                        class="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-slate-900"
+                    >
+                        <i
+                            data-lucide="align-left"
+                            class="h-4 w-4 text-blue-600"
+                        ></i>
+
+                        Product Description
+                    </h2>
+
+                    <div class="mt-3 leading-8 text-slate-600">
+                        {{ product.description|linebreaksbr }}
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Cart form -->
+            {% if product.stock > 0 %}
+
+                <form
+                    method="post"
+                    action="{% url 'cart:cart_add' product.id %}"
+                    class="mt-7"
+                >
+                    {% csrf_token %}
+
+                    <div>
+                        <label
+                            for="{{ cart_product_form.quantity.id_for_label }}"
+                            class="mb-2 block text-sm font-bold text-slate-800"
+                        >
+                            Select Quantity
+                        </label>
+
+                        <div class="relative">
+                            <select
+                                name="quantity"
+                                id="{{ cart_product_form.quantity.id_for_label }}"
+                                class="w-full appearance-none rounded-xl border border-slate-200 bg-white px-4 py-3.5 pr-11 font-semibold text-slate-800 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                            >
+                                {% for value, label in cart_product_form.quantity.field.choices %}
+                                    <option value="{{ value }}">
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+
+                            <i
+                                data-lucide="chevron-down"
+                                class="pointer-events-none absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400"
+                            ></i>
+                        </div>
+                    </div>
+
+                    {{ cart_product_form.override }}
+
+                    <button
+                        type="submit"
+                        class="mt-5 flex w-full items-center justify-center gap-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-700 px-6 py-4 text-lg font-bold text-white shadow-lg shadow-blue-500/20 transition hover:-translate-y-0.5 hover:from-blue-700 hover:to-indigo-800 hover:shadow-xl"
+                    >
+                        <i
+                            data-lucide="shopping-cart"
+                            class="h-5 w-5"
+                        ></i>
+
+                        Add to Cart
+                    </button>
+                </form>
+
+
+                <!-- Wishlist -->
+                {% if user.is_authenticated %}
+
+                    <form
+                        method="post"
+                        action="{% url 'accounts:wishlist_add' product.id %}"
+                        class="mt-3"
+                    >
+                        {% csrf_token %}
+
+                        <input
+                            type="hidden"
+                            name="next"
+                            value="{{ request.path }}"
+                        >
+
+                        <button
+                            type="submit"
+                            class="flex w-full items-center justify-center gap-3 rounded-xl border-2 border-slate-200 bg-white px-6 py-3.5 font-bold text-slate-700 transition hover:border-pink-200 hover:bg-pink-50 hover:text-pink-600"
+                        >
+                            <i
+                                data-lucide="heart"
+                                class="h-5 w-5"
+                            ></i>
+
+                            Add to Wishlist
+                        </button>
+                    </form>
+
+                {% else %}
+
+                    <a
+                        href="{% url 'accounts:login' %}?next={{ request.path|urlencode }}"
+                        class="mt-3 flex w-full items-center justify-center gap-3 rounded-xl border-2 border-slate-200 bg-white px-6 py-3.5 font-bold text-slate-700 transition hover:border-pink-200 hover:bg-pink-50 hover:text-pink-600"
+                    >
+                        <i
+                            data-lucide="heart"
+                            class="h-5 w-5"
+                        ></i>
+
+                        Login to Save
+                    </a>
+
+                {% endif %}
+
+            {% else %}
+
+                <button
+                    type="button"
+                    disabled
+                    class="mt-7 flex w-full cursor-not-allowed items-center justify-center gap-3 rounded-xl bg-slate-200 px-6 py-4 text-lg font-bold text-slate-500"
+                >
+                    <i
+                        data-lucide="circle-slash"
+                        class="h-5 w-5"
+                    ></i>
+
+                    Currently Unavailable
+                </button>
+
+            {% endif %}
+
+
+            <!-- Purchase benefits -->
+            <div class="mt-7 grid gap-3 sm:grid-cols-3">
+
+                <div
+                    class="rounded-2xl border border-slate-100 bg-slate-50 p-4 text-center"
+                >
+                    <i
+                        data-lucide="shield-check"
+                        class="mx-auto h-5 w-5 text-green-600"
+                    ></i>
+
+                    <p class="mt-2 text-xs font-bold text-slate-800">
+                        Secure Payment
+                    </p>
+                </div>
+
+                <div
+                    class="rounded-2xl border border-slate-100 bg-slate-50 p-4 text-center"
+                >
+                    <i
+                        data-lucide="truck"
+                        class="mx-auto h-5 w-5 text-blue-600"
+                    ></i>
+
+                    <p class="mt-2 text-xs font-bold text-slate-800">
+                        Fast Delivery
+                    </p>
+                </div>
+
+                <div
+                    class="rounded-2xl border border-slate-100 bg-slate-50 p-4 text-center"
+                >
+                    <i
+                        data-lucide="badge-check"
+                        class="mx-auto h-5 w-5 text-purple-600"
+                    ></i>
+
+                    <p class="mt-2 text-xs font-bold text-slate-800">
+                        Quality Assured
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+
+<!-- Review section -->
+<section
+    id="reviews"
+    class="mt-14 scroll-mt-32"
+>
+    <div class="mb-8">
+
+        <p class="text-sm font-bold uppercase tracking-[0.2em] text-blue-600">
+            Customer Feedback
         </p>
 
-
-        {% if product.stock > 0 %}
-            <form
-    method="post"
-    action="{% url 'cart:cart_add' product.id %}"
-    class="mt-8"
->
-    {% csrf_token %}
-
-    <div class="mb-4">
-        <label
-            for="{{ cart_product_form.quantity.id_for_label }}"
-            class="mb-2 block font-semibold"
+        <div
+            class="mt-2 flex flex-col justify-between gap-4 sm:flex-row sm:items-end"
         >
-            Quantity
-        </label>
+            <div>
+                <h2
+                    class="text-3xl font-extrabold tracking-tight text-slate-950"
+                >
+                    Product Reviews
+                </h2>
 
-        <select
-            name="quantity"
-            id="{{ cart_product_form.quantity.id_for_label }}"
-            class="w-full rounded-lg border px-4 py-3"
-        >
-            {% for value, label in cart_product_form.quantity.field.choices %}
-                <option value="{{ value }}">
-                    {{ label }}
-                </option>
-            {% endfor %}
-        </select>
-    </div>
+                <p class="mt-2 text-slate-500">
+                    Read genuine feedback from ShopSphere customers.
+                </p>
+            </div>
 
-    {{ cart_product_form.override }}
-
-    <button
-        type="submit"
-        class="w-full rounded-lg bg-blue-600 px-6 py-4 text-lg font-semibold text-white hover:bg-blue-700"
-    >
-        Add to cart
-    </button>
-</form>
-{% if user.is_authenticated %}
-
-    <form
-        method="post"
-        action="{% url 'accounts:wishlist_add' product.id %}"
-        class="mt-4"
-    >
-        {% csrf_token %}
-
-        <input
-            type="hidden"
-            name="next"
-            value="{{ request.path }}"
-        >
-
-        <button
-            type="submit"
-            class="w-full rounded-lg border border-blue-600 px-6 py-4 text-lg font-semibold text-blue-600 hover:bg-blue-50"
-        >
-            ♡ Add to Wishlist
-        </button>
-    </form>
-
-{% else %}
-
-    <a
-        href="{% url 'accounts:login' %}?next={{ request.path }}"
-        class="mt-4 block w-full rounded-lg border border-blue-600 px-6 py-4 text-center text-lg font-semibold text-blue-600 hover:bg-blue-50"
-    >
-        Login to Save
-    </a>
-
-{% endif %}
-        {% else %}
-            <button
-                type="button"
-                disabled
-                class="mt-8 w-full cursor-not-allowed rounded-lg bg-gray-300 px-6 py-4 text-lg font-semibold text-gray-600"
+            <div
+                class="flex items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-3"
             >
-                Currently unavailable
-            </button>
-        {% endif %}
+                <i
+                    data-lucide="star"
+                    class="h-5 w-5 fill-amber-400 text-amber-400"
+                ></i>
+
+                <div>
+                    <p class="font-extrabold text-amber-800">
+                        {{ product.average_rating|floatformat:1 }}/5
+                    </p>
+
+                    <p class="text-xs font-medium text-amber-700">
+                        {{ product.review_count }}
+                        review{{ product.review_count|pluralize }}
+                    </p>
+                </div>
+            </div>
+        </div>
 
     </div>
-</div>
-<section class="mt-12">
+
 
     <div class="grid gap-8 lg:grid-cols-3">
 
+        <!-- Review form -->
         <div class="lg:col-span-1">
 
-            <div class="rounded-2xl border bg-white p-6 shadow-sm">
+            <div
+                class="sticky top-28 rounded-3xl border border-slate-200 bg-white p-6 shadow-soft"
+            >
+                <div
+                    class="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-600"
+                >
+                    <i
+                        data-lucide="message-square-plus"
+                        class="h-6 w-6"
+                    ></i>
+                </div>
 
-                <h2 class="text-2xl font-bold">
+                <h3 class="mt-5 text-2xl font-extrabold text-slate-950">
                     {% if user_review %}
                         Update Your Review
                     {% else %}
-                        Write a Review
+                        Share Your Experience
                     {% endif %}
-                </h2>
+                </h3>
+
+                <p class="mt-2 text-sm leading-6 text-slate-500">
+                    Your review helps other customers make better
+                    purchasing decisions.
+                </p>
+
 
                 {% if user.is_authenticated %}
 
@@ -215,7 +506,7 @@
                         <div>
                             <label
                                 for="{{ review_form.rating.id_for_label }}"
-                                class="mb-2 block font-semibold"
+                                class="mb-2 block text-sm font-bold text-slate-800"
                             >
                                 Rating
                             </label>
@@ -226,9 +517,9 @@
                         <div>
                             <label
                                 for="{{ review_form.comment.id_for_label }}"
-                                class="mb-2 block font-semibold"
+                                class="mb-2 block text-sm font-bold text-slate-800"
                             >
-                                Your review
+                                Your Review
                             </label>
 
                             {{ review_form.comment }}
@@ -236,15 +527,19 @@
 
                         <button
                             type="submit"
-                            class="w-full rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700"
+                            class="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3.5 font-bold text-white shadow-lg shadow-blue-500/20 transition hover:-translate-y-0.5 hover:bg-blue-700"
                         >
+                            <i
+                                data-lucide="send"
+                                class="h-4 w-4"
+                            ></i>
+
                             {% if user_review %}
                                 Update Review
                             {% else %}
                                 Submit Review
                             {% endif %}
                         </button>
-
                     </form>
 
 
@@ -260,8 +555,13 @@
                             <button
                                 type="submit"
                                 onclick="return confirm('Delete your review?');"
-                                class="w-full rounded-lg border border-red-200 px-5 py-3 font-semibold text-red-600 hover:bg-red-50"
+                                class="flex w-full items-center justify-center gap-2 rounded-xl border border-red-200 px-5 py-3 font-bold text-red-600 transition hover:bg-red-50"
                             >
+                                <i
+                                    data-lucide="trash-2"
+                                    class="h-4 w-4"
+                                ></i>
+
                                 Delete Review
                             </button>
                         </form>
@@ -270,16 +570,26 @@
 
                 {% else %}
 
-                    <p class="mt-4 text-gray-500">
-                        Log in to write a review.
-                    </p>
-
-                    <a
-                        href="{% url 'accounts:login' %}?next={{ request.path|urlencode }}"
-                        class="mt-5 block rounded-lg bg-blue-600 px-5 py-3 text-center font-semibold text-white hover:bg-blue-700"
+                    <div
+                        class="mt-6 rounded-2xl border border-blue-100 bg-blue-50 p-5"
                     >
-                        Login to Review
-                    </a>
+                        <p class="text-sm leading-6 text-blue-800">
+                            Sign in to rate this product and share your
+                            experience.
+                        </p>
+
+                        <a
+                            href="{% url 'accounts:login' %}?next={{ request.path|urlencode }}"
+                            class="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 font-bold text-white transition hover:bg-blue-700"
+                        >
+                            <i
+                                data-lucide="log-in"
+                                class="h-4 w-4"
+                            ></i>
+
+                            Login to Review
+                        </a>
+                    </div>
 
                 {% endif %}
 
@@ -288,68 +598,102 @@
         </div>
 
 
+        <!-- Reviews list -->
         <div class="lg:col-span-2">
-
-            <div class="mb-5 flex items-center justify-between">
-
-                <h2 class="text-2xl font-bold">
-                    Customer Reviews
-                </h2>
-
-                <span class="text-gray-500">
-                    {{ product.review_count }}
-                    review{{ product.review_count|pluralize }}
-                </span>
-
-            </div>
-
 
             <div class="space-y-5">
 
                 {% for review in reviews %}
 
-                    <article class="rounded-xl border bg-white p-6 shadow-sm">
+                    <article
+                        class="review-card rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-7"
+                    >
+                        <div
+                            class="flex flex-col justify-between gap-4 sm:flex-row sm:items-start"
+                        >
+                            <div class="flex items-center gap-4">
 
-                        <div class="flex flex-wrap items-start justify-between gap-3">
+                                <div
+                                    class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-indigo-700 text-lg font-extrabold text-white"
+                                >
+                                    {{ review.user.first_name|default:review.user.username|slice:":1"|upper }}
+                                </div>
 
-                            <div>
-                                <p class="font-bold">
-                                    {{ review.user.first_name|default:review.user.username }}
-                                </p>
+                                <div>
+                                    <p class="font-bold text-slate-900">
+                                        {{ review.user.first_name|default:review.user.username }}
+                                    </p>
 
-                                <p class="mt-1 text-sm text-gray-500">
-                                    {{ review.created_at|date:"d M Y" }}
+                                    <div
+                                        class="mt-1 flex flex-wrap items-center gap-2 text-xs text-slate-400"
+                                    >
+                                        <span>
+                                            {{ review.created_at|date:"d M Y" }}
+                                        </span>
 
-                                    {% if review.updated_at != review.created_at %}
-                                        · Edited
-                                    {% endif %}
-                                </p>
+                                        {% if review.updated_at != review.created_at %}
+                                            <span>•</span>
+
+                                            <span>Edited</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
                             </div>
 
-                            <div class="rounded-full bg-yellow-50 px-3 py-1 font-semibold text-yellow-700">
-                                ★ {{ review.rating }}/5
-                            </div>
 
+                            <div
+                                class="inline-flex w-fit items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1.5 font-bold text-amber-700"
+                            >
+                                <i
+                                    data-lucide="star"
+                                    class="h-4 w-4 fill-amber-400 text-amber-400"
+                                ></i>
+
+                                {{ review.rating }}/5
+                            </div>
                         </div>
 
-                        <p class="mt-5 leading-7 text-gray-600">
+                        <div
+                            class="mt-5 rounded-2xl bg-slate-50 p-5 leading-7 text-slate-600"
+                        >
                             {{ review.comment|linebreaksbr }}
-                        </p>
+                        </div>
 
+                        <div
+                            class="mt-4 flex items-center gap-2 text-xs font-medium text-green-600"
+                        >
+                            <i
+                                data-lucide="badge-check"
+                                class="h-4 w-4"
+                            ></i>
+
+                            ShopSphere customer review
+                        </div>
                     </article>
 
                 {% empty %}
 
-                    <div class="rounded-xl border bg-white p-10 text-center shadow-sm">
+                    <div
+                        class="rounded-3xl border border-dashed border-slate-300 bg-white p-12 text-center"
+                    >
+                        <div
+                            class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 text-slate-400"
+                        >
+                            <i
+                                data-lucide="message-circle"
+                                class="h-8 w-8"
+                            ></i>
+                        </div>
 
-                        <h3 class="text-xl font-bold">
+                        <h3 class="mt-5 text-xl font-extrabold text-slate-900">
                             No reviews yet
                         </h3>
 
-                        <p class="mt-2 text-gray-500">
-                            Be the first customer to review this product.
+                        <p class="mx-auto mt-2 max-w-sm text-slate-500">
+                            Be the first customer to share an opinion
+                            about this product.
                         </p>
-
                     </div>
 
                 {% endfor %}
@@ -359,7 +703,6 @@
         </div>
 
     </div>
-
 </section>
 
 {% endblock %}

@@ -23,8 +23,10 @@ class ReviewForm(forms.ModelForm):
                 ],
                 attrs={
                     "class": (
-                        "w-full rounded-lg border "
-                        "border-gray-300 px-4 py-3"
+                        "w-full rounded-xl border border-slate-200 "
+            "bg-white px-4 py-3.5 font-medium text-slate-800 "
+            "outline-none transition focus:border-blue-500 "
+            "focus:ring-4 focus:ring-blue-100"
                     ),
                 },
             ),
@@ -32,16 +34,12 @@ class ReviewForm(forms.ModelForm):
             "comment": forms.Textarea(
                 attrs={
                     "rows": 5,
-                    "placeholder": (
-                        "Share your experience with this product..."
-                    ),
-                    "class": (
-                        "w-full rounded-lg border "
-                        "border-gray-300 px-4 py-3 "
-                        "focus:border-blue-500 "
-                        "focus:outline-none "
-                        "focus:ring-2 "
-                        "focus:ring-blue-200"
+        "placeholder": "What did you like or dislike about this product?",
+        "class": (
+            "w-full resize-none rounded-xl border border-slate-200 "
+            "bg-white px-4 py-3.5 text-slate-800 outline-none "
+            "transition placeholder:text-slate-400 "
+            "focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
                     ),
                 }
             ),
